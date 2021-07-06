@@ -12,7 +12,7 @@ The following 3 steps are needed to run spinners.
  - create a spinner instance by `create!`
  - start the spinner by `start!`
  - stop it by `stop!`
- 
+
 Here is a simple example.
 
 ```clojure
@@ -22,6 +22,13 @@ Here is a simple example.
   (start! s)
   (Thread/sleep 2000)
   (stop! s))
+```
+
+That can also be done with `spin!`.
+
+```clojure
+(spin! {:text "Spin with spin!"}
+       (Thread/sleep 2000))
 ```
 
 You can find some more examples [here](https://github.com/popoppo/clojure-spinners/tree/dev/src/clojure_spinners/examples).
