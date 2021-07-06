@@ -1,0 +1,5 @@
+{:rules {:whitespace {:remove-trailing? true
+                      :insert-missing? false}
+         :blank-lines {:trim-consecutive? true
+                       :max-consecutive 1
+                       :padding-lines 1}}}

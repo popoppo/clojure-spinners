@@ -1,0 +1,46 @@
+name: RunExamples
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  unit_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: lein deps
+    - name: Run tests
+      run: lein exec -p src/clojure_spinners/examples/example02.clj
+      run: lein exec -p src/clojure_spinners/examples/example03.clj
+      run: lein exec -p src/clojure_spinners/examples/example04.clj
+
+  tagging_and_deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: unit_test
+    runs-on: ubuntu-latest
+    env:
+      CLOJARS_USERNAME: popoppo
+      CLOJARS_PASSWORD: ${{ secrets.CLOJARS_DEPLOY_TOKEN }}
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        git config --global user.email "popoppo39@gmail.com"
+        git config --global user.name "popoppo"
+        lein vcs tag --no-sign
+        lein vcs push
+        lein deploy clojars
+        git fetch origin dev
+        git checkout dev
+        lein change version leiningen.release/bump-version patch
+        # '-SNAPSHOT' isn't used
+        lein change version leiningen.release/bump-version release
+        lein vcs commit
+        lein vcs push
