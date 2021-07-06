@@ -3,9 +3,9 @@
     [clojure-spinners.spinner :as s]))
 
 (def original-spinners
-  {:orig1 {:interval 100
-           :frames ["p" "b" "d" "q"]}
-   :orig2 {:interval 100
+  {:orig1 {:interval 200
+           :frames ["<" "V" ">" "A"]}
+   :orig2 {:interval 150
            :frames ["o" "O"]}})
 
 (s/load-spinners original-spinners)
