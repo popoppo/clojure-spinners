@@ -1,6 +1,6 @@
 (ns clojure-spinners.examples.example03
   (:require
-    [clojure-spinners.spinner :as s]))
+    [clojure-spinners.core :as s]))
 
 (let [opts {:spinner :clock
             :text "Spin!!"}

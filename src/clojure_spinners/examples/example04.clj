@@ -1,6 +1,6 @@
 (ns clojure-spinners.examples.examle04
   (:require
-    [clojure-spinners.spinner :as s]))
+    [clojure-spinners.core :as s]))
 
 (def original-spinners
   {:orig1 {:interval 200

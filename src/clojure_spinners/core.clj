@@ -1,5 +1,6 @@
-(ns clojure-spinners.spinner
+(ns clojure-spinners.core
   (:require
+    [clojure-spinners.util.wide-char-ranges :as wcr]
     [clojure.edn :as edn]))
 
 (def codes
@@ -15,10 +16,33 @@
 ;; Load built-in spinners
 (def spinners (atom (-> "spinners.edn" slurp edn/read-string)))
 
+(defn split-string-by-code-points
+  [s]
+  (loop [result []
+         offset 0]
+    (let [next-offset (.offsetByCodePoints s offset 1)
+          uc (.substring s offset next-offset)
+          r (conj result uc)]
+      (if (< next-offset (.length s))
+        (recur r next-offset)
+        r))))
+
 (defn set-spinner-conf!
   [conf]
   (let [settings (get @spinners (keyword (:spinner conf)))
-        max-width (->> (:frames settings) (map count) (apply max))]
+        max-width (->> (:frames settings)
+                       ;; (map count)
+                       (reduce (fn [acc frame]
+                                 (let [cs (split-string-by-code-points frame)]
+                                   (->> (reduce
+                                          (fn [width c]
+                                            (+ width
+                                               (if (wcr/wide-char? (.codePointAt c 0)) 2 1)))
+                                          0
+                                          cs)
+                                        (conj acc))))
+                               [])
+                       (apply max))]
     (reset! spinner-conf (assoc conf
                                 :spinner settings
                                 :max-width max-width))))

@@ -1,6 +1,6 @@
 (ns clojure-spinners.examples.example01
   (:require
-    [clojure-spinners.spinner :as s]))
+    [clojure-spinners.core :as s]))
 
 (let [ks (sort (keys (s/get-spinners)))
       s (s/create! {:spinner (first ks)

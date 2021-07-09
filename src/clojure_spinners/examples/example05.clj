@@ -1,6 +1,7 @@
 (ns clojure-spinners.examples.example05
   (:require
-    [clojure-spinners.spinner :as s]))
+    [clojure-spinners.core :as s]))
 
-(s/spin! {:text "Spin with spin!"}
+(s/spin! {:spinner :aesthetic
+          :text "Spin with spin!"}
          (Thread/sleep 2000))
