@@ -1,10 +1,8 @@
-<!---
-![CI](https://github.com/popoppo/clojure-fire/workflows/CI/badge.svg)
--->
+![Test](https://github.com/popoppo/clojure-spinners/workflows/RunExamples/badge.svg)
 
 # clojure-spinners
 
-![all-spinners](https://user-images.githubusercontent.com/934188/124562620-34e91900-de7a-11eb-825e-85ec252ba4f5.gif)
+![all-spinners](https://user-images.githubusercontent.com/934188/125028575-3e18f680-e0c3-11eb-8e5d-282f5980f85c.gif)
 
 Various spinners for Clojure.  
 The built-in spinners are coming from [cli-spinners](https://github.com/sindresorhus/cli-spinners), and implementation is inspired by [ora](https://github.com/sindresorhus/ora).
