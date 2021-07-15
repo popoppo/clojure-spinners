@@ -14,4 +14,4 @@
   :src-paths ["src"]
   :test-paths ["test"]
 
-  :repl-options {:init-ns clojure-spinners.spinner})
+  :repl-options {:init-ns clojure-spinners.core})
