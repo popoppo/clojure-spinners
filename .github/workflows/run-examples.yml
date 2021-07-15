@@ -18,11 +18,8 @@ jobs:
     - name: Install dependencies
       run: lein deps
     - name: Run tests
-      run: |
-        lein exec -p src/clojure_spinners/examples/example02.clj
-        lein exec -p src/clojure_spinners/examples/example03.clj
-        lein exec -p src/clojure_spinners/examples/example04.clj
-        lein exec -p src/clojure_spinners/examples/example05.clj
+      run: | # Run all files in examples dir but all_spinners.clj
+        find src/clojure_spinners/examples -name "*clj" -not -name "all*" | xargs -n 1 lein exec -p
 
   tagging_and_deploy:
     if: github.ref == 'refs/heads/main'
