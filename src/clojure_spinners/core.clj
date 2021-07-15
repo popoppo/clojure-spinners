@@ -1,7 +1,9 @@
 (ns clojure-spinners.core
   (:require
     [clojure-spinners.util.wide-char-ranges :as wcr]
-    [clojure.edn :as edn]))
+    [clojure.edn :as edn])
+  (:import
+    java.text.BreakIterator))
 
 (def codes
   {:clear-line "\033[K"
@@ -16,16 +18,22 @@
 ;; Load built-in spinners
 (def spinners (atom (-> "spinners.edn" slurp edn/read-string)))
 
-(defn split-string-by-code-points
+(defn split-string-by-break-iterator
   [s]
-  (loop [result []
-         offset 0]
-    (let [next-offset (.offsetByCodePoints s offset 1)
-          uc (.substring s offset next-offset)
-          r (conj result uc)]
-      (if (< next-offset (.length s))
-        (recur r next-offset)
-        r))))
+  (let [bi (doto (BreakIterator/getCharacterInstance)
+             (.setText s))
+        indices (loop [result []] ;; iterate-seq?
+                  (let [v (.next bi)]
+                    (if (= v -1)
+                      result
+                      (recur (conj result v)))))]
+    (loop [indices indices
+           result []
+           last-index 0]
+      (if-let [idx (first indices)]
+        (let [c (.substring s last-index idx)]
+          (recur (rest indices) (conj result c) idx))
+        result))))
 
 (defn set-spinner-conf!
   [conf]
@@ -33,10 +41,11 @@
         max-width (->> (:frames settings)
                        ;; (map count)
                        (reduce (fn [acc frame]
-                                 (let [cs (split-string-by-code-points frame)]
+                                 (let [cs (split-string-by-break-iterator frame)]
                                    (->> (reduce
                                           (fn [width c]
                                             (+ width
+                                               ;; TODO: country flags should also be cared
                                                (if (wcr/wide-char? (.codePointAt c 0)) 2 1)))
                                           0
                                           cs)
@@ -58,10 +67,15 @@
             max-width (get @spinner-conf :max-width)
             frame-idx (mod i (count frames))
             frame (nth frames frame-idx)
-            spfmt (str "\r%" max-width "s%s\r%s")]
+            ;;spfmt (str "\r%" max-width "s%s\r%s")
+            spfmt (if (= (:position @spinner-conf) :right)
+                    (format (str "\r%s%" max-width "s") text frame)
+                    (format (str "\r%" max-width "s%s\r%s") "" text frame))]
         ;; Clear line, print spinner and message and flush
         (print "\r" (:clear-line codes))
-        (print (format spfmt "" text frame))
+        ;;(print (format spfmt "" text frame))
+        ;;(print (format spfmt frame text))
+        (print spfmt)
         (flush)
         (Thread/sleep interval)
         (recur (inc i))))
