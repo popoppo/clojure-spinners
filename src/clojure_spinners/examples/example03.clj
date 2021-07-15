@@ -13,5 +13,6 @@
   (s/insert-msg "Wrapping up")
   (s/change-spinner! {:spinner :christmas})
   (Thread/sleep 2000)
-  (s/stop! s {:persist false :text "Done"}))
+  (s/stop! s {:persist false})
+  (println "Done"))
 
