@@ -8,7 +8,18 @@
 (def codes
   {:clear-line "\033[K"
    :cursor-show "\033[?25h"
-   :cursor-hide "\033[?25l"})
+   :cursor-hide "\033[?25l"
+   :fg-reset "\033[39m"})
+
+(def color-map
+  {:black 0
+   :red 1
+   :green 2
+   :yellow 3
+   :blue 4
+   :magenta 5
+   :cyan 6
+   :white 7})
 
 ;; TODO: check ANSI_COLORS_DISABLED
 
@@ -67,10 +78,12 @@
             max-width (get @spinner-conf :max-width)
             frame-idx (mod i (count frames))
             frame (nth frames frame-idx)
-            ;;spfmt (str "\r%" max-width "s%s\r%s")
-            spfmt (if (= (:position @spinner-conf) :right)
-                    (format (str "\r%s%" max-width "s") text frame)
-                    (format (str "\r%" max-width "s%s\r%s") "" text frame))]
+            color (if-let [c (:color @spinner-conf)]
+                    (format "\033[38;5;%dm" (color-map c))
+                    "")
+            spfmt (if (= (keyword (:placement @spinner-conf)) :right)
+                    (format "\r%s%s%s%s" text color frame (:fg-reset codes))
+                    (format (str "\r%" max-width "s%s\r%s%s%s") "" text color frame (:fg-reset codes)))]
         ;; Clear line, print spinner and message and flush
         (print "\r" (:clear-line codes))
         ;;(print (format spfmt "" text frame))
