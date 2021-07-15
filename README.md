@@ -2,10 +2,10 @@
 
 # clojure-spinners
 
-![all-spinners](https://user-images.githubusercontent.com/934188/125028575-3e18f680-e0c3-11eb-8e5d-282f5980f85c.gif)
+<img src="https://user-images.githubusercontent.com/934188/125028575-3e18f680-e0c3-11eb-8e5d-282f5980f85c.gif" width="480px">
 
 Various spinners for Clojure.  
-The built-in spinners are coming from [cli-spinners](https://github.com/sindresorhus/cli-spinners), and implementation is inspired by [ora](https://github.com/sindresorhus/ora).
+The built-in spinners are coming from [cli-spinners](https://github.com/sindresorhus/cli-spinners) and the implementation is designed to be (somewhat) compatible with [clj-commons/spinner](https://github.com/clj-commons/spinner)
 
 <!-- Note that this module just provide spinners but not colors. This would be helpful if you want to make them colorful. -->
 
@@ -34,7 +34,7 @@ That can also be done with `spin!`.
        (Thread/sleep 2000))
 ```
 
-You can find some more examples [here](https://github.com/popoppo/clojure-spinners/tree/dev/src/clojure_spinners/examples).
+You can find more examples [here](https://github.com/popoppo/clojure-spinners/tree/dev/src/clojure_spinners/examples).
 
 ## Need more colors?
 Although [ora](https://github.com/sindresorhus/ora) provides features to manage text colors, this library doesn't support it to make the implementation simple.
