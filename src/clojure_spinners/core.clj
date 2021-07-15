@@ -81,14 +81,12 @@
             color (if-let [c (:color @spinner-conf)]
                     (format "\033[38;5;%dm" (color-map c))
                     "")
-            spfmt (if (= (keyword (:placement @spinner-conf)) :right)
-                    (format "\r%s%s%s%s" text color frame (:fg-reset codes))
-                    (format (str "\r%" max-width "s%s\r%s%s%s") "" text color frame (:fg-reset codes)))]
+            s (if (= (keyword (:placement @spinner-conf)) :right)
+                (format "\r%s%s%s%s" text color frame (:fg-reset codes))
+                (format (str "\r%" max-width "s%s\r%s%s%s") "" text color frame (:fg-reset codes)))]
         ;; Clear line, print spinner and message and flush
         (print "\r" (:clear-line codes))
-        ;;(print (format spfmt "" text frame))
-        ;;(print (format spfmt frame text))
-        (print spfmt)
+        (print s)
         (flush)
         (Thread/sleep interval)
         (recur (inc i))))
@@ -119,12 +117,10 @@
       (.interrupt)
       (.join))
     (if (:persist option)
-      (println "")
+      (println "") ;; \n
       (do
         (print "\r")
-        (print "\033[K\r")))
-    (when-let [msg (:text option)]
-      (println msg)))
+        (print "\033[K\r"))))
   nil)
 
 (defmacro spin!
