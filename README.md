@@ -7,8 +7,6 @@
 Various spinners for Clojure.  
 The built-in spinners are coming from [cli-spinners](https://github.com/sindresorhus/cli-spinners) and the implementation is designed to be (somewhat) compatible with [clj-commons/spinner](https://github.com/clj-commons/spinner)
 
-<!-- Note that this module just provide spinners but not colors. This would be helpful if you want to make them colorful. -->
-
 ## Usage
 
 The following 3 steps are needed to run spinners.
@@ -36,19 +34,17 @@ That can also be done with `spin!`.
 
 You can find more examples [here](https://github.com/popoppo/clojure-spinners/tree/dev/src/clojure_spinners/examples).
 
-## Need more colors?
-Although [ora](https://github.com/sindresorhus/ora) provides features to manage text colors, this library doesn't support it to make the implementation simple.
-
 <!-- If you want to make spinners colorful,  -->
 
 ## Character width
-You can use any unicode chars and the width of them are based on the following document.
+You can use any unicode chars.__
+The width of them are calculated based on the following document.
 
 https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt  
-(Its top page is https://www.unicode.org/reports/tr11/)
+(Top page: https://www.unicode.org/reports/tr11/)
 
 Note that all chars defined as "Ambiguous" are handled as half width characters.  
-Basically you don't need to care about it, but might get unexpected output if you use them.
+Basically you don't need to care about it, but might get unexpected output with them.
 
 ## Related
 - [cli-spinners](https://github.com/sindresorhus/cli-spinners) - Spinners for use in the terminal.
