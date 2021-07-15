@@ -1,4 +1,4 @@
-(ns clojure-spinners.examples.example02
+(ns clojure-spinners.examples.spin-and-persist
   (:require
     [clojure-spinners.core :as s]))
 

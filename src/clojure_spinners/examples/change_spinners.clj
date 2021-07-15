@@ -1,4 +1,4 @@
-(ns clojure-spinners.examples.example03
+(ns clojure-spinners.examples.change-spinners
   (:require
     [clojure-spinners.core :as s]))
 
@@ -15,4 +15,3 @@
   (Thread/sleep 2000)
   (s/stop! s {:persist false})
   (println "Done"))
-

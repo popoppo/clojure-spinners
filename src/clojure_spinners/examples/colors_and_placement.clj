@@ -1,4 +1,4 @@
-(ns clojure-spinners.examples.example05
+(ns clojure-spinners.examples.colors-and-placement
   (:require
     [clojure-spinners.core :as s]))
 
