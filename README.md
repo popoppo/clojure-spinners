@@ -2,7 +2,7 @@
 
 # clojure-spinners
 
-<img src="https://user-images.githubusercontent.com/934188/125028575-3e18f680-e0c3-11eb-8e5d-282f5980f85c.gif" width="480px">
+<img src="https://user-images.githubusercontent.com/934188/125885511-a3395bab-1fcc-413b-9f82-60f3a749c843.gif" width="480px">
 
 Various spinners for Clojure.  
 The built-in spinners are coming from [cli-spinners](https://github.com/sindresorhus/cli-spinners) and the implementation is designed to be (somewhat) compatible with [clj-commons/spinner](https://github.com/clj-commons/spinner)
@@ -37,7 +37,7 @@ You can find more examples [here](https://github.com/popoppo/clojure-spinners/tr
 <!-- If you want to make spinners colorful,  -->
 
 ## Character width
-You can use any unicode chars.__
+You can use any unicode chars.  
 The width of them are calculated based on the following document.
 
 https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt  
