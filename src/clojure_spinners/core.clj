@@ -1,9 +1,7 @@
 (ns clojure-spinners.core
   (:require
     [clojure-spinners.util.wide-char-ranges :as wcr]
-    [clojure.edn :as edn])
-  (:import
-    java.text.BreakIterator))
+    [clojure.edn :as edn]))
 
 (def codes
   {:clear-line "\033[K"
@@ -29,22 +27,50 @@
 ;; Load built-in spinners
 (def spinners (atom (-> "spinners.edn" slurp edn/read-string)))
 
-(defn split-string-by-break-iterator
+(defn split-string-by-code-points
   [s]
-  (let [bi (doto (BreakIterator/getCharacterInstance)
-             (.setText s))
-        indices (loop [result []] ;; iterate-seq?
-                  (let [v (.next bi)]
-                    (if (= v -1)
-                      result
-                      (recur (conj result v)))))]
-    (loop [indices indices
-           result []
-           last-index 0]
-      (if-let [idx (first indices)]
-        (let [c (.substring s last-index idx)]
-          (recur (rest indices) (conj result c) idx))
-        result))))
+  (loop [result []
+         offset 0]
+    (let [next-offset (.offsetByCodePoints s offset 1)
+          uc (.substring s offset next-offset)
+          r (conj result uc)]
+      (if (< next-offset (.length s))
+        (recur r next-offset)
+        r))))
+
+(defn char-width
+  [c]
+  (let [cnt (.length c)]
+    (condp = cnt
+      1 (if (#{8203 8204 8205 65038 65039} (int (.charAt c 0))) ;; \u200[bcd] \ufe0[ef]
+          0
+          (if (wcr/wide-char? (.codePointAt c 0)) 2 1))
+      2 (if (Character/isSurrogatePair (.charAt c 0) (.charAt c 1))
+          (cond
+            (wcr/wide-char? (.codePointAt c 0)) 2
+            (wcr/ris? (.codePointAt c 0)) 2
+            :else 1)
+          2)
+      2 ;; There might be exceptions?
+      )))
+
+(defn string-width
+  [s]
+  (loop [cnt 0
+         chars (split-string-by-code-points s)]
+    (if-let [c (first chars)]
+      (let [w (char-width c)]
+        (if (zero? w)
+          (condp = (.codePointAt c 0)
+            8205 (recur cnt (drop 2 chars))
+            ;; 8203 8204 65038 65039
+            (recur cnt (rest chars)))
+          (if (and (wcr/ris? (.codePointAt c 0))
+                   (second chars)
+                   (wcr/ris? (.codePointAt (second chars) 0)))
+            (recur (+ cnt w) (drop 2 chars)) ;; country flag (maybe)
+            (recur (+ cnt w) (rest chars)))))
+      cnt)))
 
 (defn set-spinner-conf!
   [conf]
@@ -52,15 +78,7 @@
         max-width (->> (:frames settings)
                        ;; (map count)
                        (reduce (fn [acc frame]
-                                 (let [cs (split-string-by-break-iterator frame)]
-                                   (->> (reduce
-                                          (fn [width c]
-                                            (+ width
-                                               ;; TODO: country flags should also be cared
-                                               (if (wcr/wide-char? (.codePointAt c 0)) 2 1)))
-                                          0
-                                          cs)
-                                        (conj acc))))
+                                 (conj acc (string-width frame)))
                                [])
                        (apply max))]
     (reset! spinner-conf (assoc conf
