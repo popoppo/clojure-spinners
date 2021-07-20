@@ -15,11 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Install dependencies
       run: lein deps
-    - name: Run tests
-      run: | # Run all files in examples dir but all_spinners.clj
-        find src/clojure_spinners/examples -name "*clj" -not -name "all*" | xargs -n 1 lein exec -p
+
+    - name: Setup Babashka
+      uses: turtlequeue/setup-babashka@v1.3.0
+      with:
+        babashka-version: 0.3.2
+
+    # Run all files in examples dir but all_spinners.clj
+    - name: Run examples
+      run: find src/clojure_spinners/examples -name "*clj" -not -name "all*" | xargs -n 1 bb -cp src
 
   tagging_and_deploy:
     if: github.ref == 'refs/heads/main'
