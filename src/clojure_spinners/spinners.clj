@@ -1,4 +1,4 @@
-(ns clojure-spinners)
+(ns clojure-spinners.spinners)
 
 ;; Spinners are from:
 ;; * cli-spinners:

@@ -1,4 +1,4 @@
-(defproject com.github.popoppo/clojure-spinners "0.1.1"
+(defproject com.github.popoppo/clojure-spinners "0.1.2"
   :description "Various spinners for Clojure"
   :url "https://github.com/popoppo/clojure-spinners"
   :license {:name "MIT"

@@ -1,7 +1,8 @@
 (ns clojure-spinners.core
   (:require
+    [clojure-spinners.spinners :as s]
     [clojure-spinners.util.wide-char-ranges :as wcr]
-    [clojure.edn :as edn]))
+    [clojure.set :as set]))
 
 (def codes
   {:clear-line "\033[K"
@@ -19,13 +20,15 @@
    :cyan 6
    :white 7})
 
+(def zero-width-char-set #{8203 8204 8205 65038 65039}) ;; \u200[bcd] \ufe0[ef]
+
 ;; TODO: check ANSI_COLORS_DISABLED
 
 ;; Global conf
 (def spinner-conf (atom {}))
 
 ;; Load built-in spinners
-(def spinners (atom (-> "spinners.edn" slurp edn/read-string)))
+(def spinners (atom s/spinners))
 
 (defn split-string-by-code-points
   [s]
@@ -42,7 +45,7 @@
   [c]
   (let [cnt (.length c)]
     (condp = cnt
-      1 (if (#{8203 8204 8205 65038 65039} (int (.charAt c 0))) ;; \u200[bcd] \ufe0[ef]
+      1 (if (zero-width-char-set (int (.charAt c 0)))
           0
           (if (wcr/wide-char? (.codePointAt c 0)) 2 1))
       2 (if (Character/isSurrogatePair (.charAt c 0) (.charAt c 1))
@@ -62,9 +65,8 @@
       (let [w (char-width c)]
         (if (zero? w)
           (condp = (.codePointAt c 0)
-            8205 (recur cnt (drop 2 chars))
-            ;; 8203 8204 65038 65039
-            (recur cnt (rest chars)))
+            8205 (recur cnt (drop 2 chars)) ;; \u200d zero width joiner
+            (recur cnt (rest chars))) ;; 8203 8204 65038 65039
           (if (and (wcr/ris? (.codePointAt c 0))
                    (second chars)
                    (wcr/ris? (.codePointAt (second chars) 0)))
@@ -73,10 +75,11 @@
       cnt)))
 
 (defn set-spinner-conf!
-  [conf]
-  (let [settings (get @spinners (keyword (:spinner conf)))
+  [new-conf]
+  (let [conf (merge @spinner-conf (set/rename-keys new-conf {:spinner :spinner-name}))
+        spinner-name (:spinner-name conf)
+        settings (get @spinners spinner-name (:dots @spinners))
         max-width (->> (:frames settings)
-                       ;; (map count)
                        (reduce (fn [acc frame]
                                  (conj acc (string-width frame)))
                                [])
@@ -84,6 +87,21 @@
     (reset! spinner-conf (assoc conf
                                 :spinner settings
                                 :max-width max-width))))
+
+(defn colorize
+  [color-conf]
+  (if color-conf
+    (if (keyword? color-conf)
+      ;; basic ansi color
+      (format "\033[38;5;%dm" (color-map color-conf))
+      ;; should be vec with 3 items: [r g b].
+      (if-let [[r g b] (and (vector? color-conf)
+                            (= (count color-conf) 3)
+                            color-conf)]
+        (format "\033[38;2;%d;%d;%dm" r g b)
+        ;; just ignore color-conf
+        ""))
+    ""))
 
 (defn animate
   []
@@ -96,9 +114,7 @@
             max-width (get @spinner-conf :max-width)
             frame-idx (mod i (count frames))
             frame (nth frames frame-idx)
-            color (if-let [c (:color @spinner-conf)]
-                    (format "\033[38;5;%dm" (color-map c))
-                    "")
+            color (colorize (:color @spinner-conf))
             s (if (= (keyword (:placement @spinner-conf)) :right)
                 (format "\r%s%s%s%s" text color frame (:fg-reset codes))
                 (format (str "\r%" max-width "s%s\r%s%s%s") "" text color frame (:fg-reset codes)))]
@@ -116,9 +132,8 @@
 (defn create!
   ([] (create! {}))
   ([conf]
-   (if (:spinner conf)
-     (set-spinner-conf! conf)
-     (set-spinner-conf! (merge {:spinner :dots} conf)))
+   (reset! spinner-conf {})
+   (set-spinner-conf! conf)
    (doto (Thread. #(animate))
      (.setDaemon true))))
 
@@ -161,7 +176,7 @@
 
 (defn change-spinner!
   [conf]
-  (set-spinner-conf! (merge @spinner-conf conf)))
+  (set-spinner-conf! conf))
 
 (defn insert-msg
   [msg]
