@@ -1,7 +1,7 @@
 (ns clojure-spinners.core
   (:require
+    [clojure-spinners.spinners :as s]
     [clojure-spinners.util.wide-char-ranges :as wcr]
-    [clojure.edn :as edn]
     [clojure.set :as set]))
 
 (def codes
@@ -28,7 +28,7 @@
 (def spinner-conf (atom {}))
 
 ;; Load built-in spinners
-(def spinners (atom (-> "spinners.edn" slurp edn/read-string)))
+(def spinners (atom s/spinners))
 
 (defn split-string-by-code-points
   [s]
