@@ -189,9 +189,26 @@
    [196608 262141]  ;; 30000 ... 3FFFD
    ])
 
+(def regional-indicator-symbols
+  [127462 127487] ;; 1f1e6 ... 1f1ff
+  )
+
 (defn code-point->int
   [code-point]
   (Integer/parseInt code-point 16))
+
+(defn ris?
+  [cp]
+  (let [[ris-s ris-e] regional-indicator-symbols]
+    (<= ris-s cp ris-e)))
+
+(defn country-flag?
+  [c]
+  (and
+    (= (.length c) 4)
+    (= 2 (.codePointCount c 0 (.length c)))
+    (ris? (.codePointAt c 0))
+    (ris? (.codePointAt c 2))))
 
 (defn wide-char?
   "code-point := int"
